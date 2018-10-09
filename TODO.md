@@ -25,6 +25,7 @@
 ### New frontend
 
 * [ ] `feature` Redesign frontend
+* [ ] `tech` `frontend` upgrade to Elm 0.19
 * [ ] `tech` `frontend` rewrite frontend on create-elm-app (or alternative) foundation
 
 
@@ -44,5 +45,5 @@
 
 ## Backlog
 
-* [ ] `backend` `frontend` Event-based API (websocket)
-* [ ] `backend` Rewrite to Phoenix?
+* [ ] `tech` `backend` `frontend` Event-based API (websocket)
+* [ ] `tech` `backend` Rewrite to Phoenix?
