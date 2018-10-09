@@ -4,7 +4,7 @@
 
 ### Development goodness
 
-* [ ] `tech` host the code on Github
+* [x] `tech` host the code on Github
 * [x] `tech` `frontend` configurable backend host url for frontend
 * [ ] `tech` `frontend` one command dev env setup: conteinerize frontend
 
