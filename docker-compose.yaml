@@ -10,3 +10,13 @@ services:
     volumes:
       - "./backend/src:/app"
     tty: true
+
+  frontend_dev:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    ports:
+      - "8000:8000"
+    volumes:
+      - "./frontend:/app"
+    tty: true
