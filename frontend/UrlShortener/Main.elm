@@ -80,15 +80,18 @@ init location =
 
         notificationCenter =
             Ui.NotificationCenter.init ()
+
+        config =
+            Config.config
     in
         ( { input = input
           , button = button
           , urls = urls
           , notificationCenter = notificationCenter
           , currentLocation = location
-          , config = Config.config
+          , config = config
           }
-        , loadUrls
+        , loadUrls config.api
         )
 
 
@@ -241,7 +244,7 @@ view model =
                 [ div [] [ Html.map Input (Ui.Input.view model.input) ]
                 , div [] [ Ui.Button.view ShortenBtnClick model.button ]
                 ]
-            , viewUrls model
+            , urlsView model
             ]
         ]
         -- TODO: footer?
@@ -249,14 +252,14 @@ view model =
         ]
 
 
-viewUrls : Model -> Html.Html Msg
-viewUrls model =
+urlsView : Model -> Html.Html Msg
+urlsView model =
     Ui.Container.column [] <|
-        List.map (viewUrl model.currentLocation) model.urls
+        List.map (urlView model.config.api) model.urls
 
 
-viewUrl : Navigation.Location -> UrlItem -> Html.Html Msg
-viewUrl location urlItem =
+urlView : String -> UrlItem -> Html.Html Msg
+urlView host urlItem =
     case urlItem of
         Saved url ->
             let
@@ -270,7 +273,7 @@ viewUrl location urlItem =
                     Ui.Link.Model longContents (Just "_blank") (Just longUrl) Nothing
 
                 shortUrl =
-                    "//" ++ location.host ++ "/" ++ Code.toString url.code
+                    host ++ "/" ++ Code.toString url.code
 
                 shortContents =
                     [ text shortUrl ]
