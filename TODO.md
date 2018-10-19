@@ -34,6 +34,7 @@
 
 * [ ] `tech` `frontend` frontend: generate api layer from swagger docs
 * [ ] `tech` `backend` backend: swagger api docs (+ maru?)
+* [ ] `tech` `frontend` `backend` document the code
 
 
 ## V3
