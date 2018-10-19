@@ -6,7 +6,7 @@ config :logger,
 
 config :url_shortener,
   corsica: [
-  	origins: "*",
+    origins: "*",
     allow_headers: :all,
     log: [
       rejected: :warn,

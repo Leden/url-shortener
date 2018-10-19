@@ -13,5 +13,4 @@ defmodule Tests.UrlShortener.Services.CodeGenerator do
     assert first != second
     assert second != third
   end
-
 end

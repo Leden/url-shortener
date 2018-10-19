@@ -3,24 +3,26 @@ defmodule UrlShortener.Http.Router do
 
   alias UrlShortener.Data.Link
   alias UrlShortener.Services.CodeGenerator
+  alias UrlShortener.Http.Schemas
 
-  @store Application.get_env :url_shortener, :store_module
+  @store Application.get_env(:url_shortener, :store_module)
 
+  plug(Corsica, Application.get_env(:url_shortener, :corsica))
 
-  plug Corsica, Application.get_env(:url_shortener, :corsica)
-
-  plug Plug.Static,
+  plug(Plug.Static,
     at: "/",
     from: :url_shortener,
     only: ~w(index.html assets)
+  )
 
-  plug Plug.Parsers,
+  plug(Plug.Parsers,
     parsers: [:json],
     pass: ["application/json"],
     json_decoder: Poison
+  )
 
-  plug :match
-  plug :dispatch
+  plug(:match)
+  plug(:dispatch)
 
   get "/" do
     conn
@@ -37,28 +39,45 @@ defmodule UrlShortener.Http.Router do
   end
 
   post "/urls" do
-    long = conn.params["long"]
-    prev_code = @store.get_last_code(:store)
-    code = CodeGenerator.next(prev_code || CodeGenerator.initial())
-    link = %Link{code: code, long: long}
+    with {:ok, %{long: long}} <- validate(conn.params, Schemas.CreateUrl) do
+      prev_code = @store.get_last_code(:store)
+      code = CodeGenerator.next(prev_code || CodeGenerator.initial())
+      link = %Link{code: code, long: long}
 
-    :ok = @store.create(:store, link)
+      :ok = @store.create(:store, link)
 
-    body = Poison.encode!(link)
+      body = Poison.encode!(link)
 
-    conn
-    |> put_resp_header("content-type", "application/json")
-    |> send_resp(201, body)
+      conn
+      |> put_resp_header("content-type", "application/json")
+      |> send_resp(201, body)
+    else
+      {:error, error} ->
+        body = Poison.encode!(error)
+
+        conn
+        |> put_resp_header("content-type", "application/json")
+        |> send_resp(400, body)
+    end
   end
 
   get "/urls/*code" do
     "/urls/" <> real_code = conn.request_path
-    {:ok, link} = @store.get(:store, real_code)
-    body = Poison.encode!(link)
 
-    conn
-    |> put_resp_header("content-type", "application/json")
-    |> send_resp(200, body)
+    with {:ok, link} <- @store.get(:store, real_code) do
+      body = Poison.encode!(link)
+
+      conn
+      |> put_resp_header("content-type", "application/json")
+      |> send_resp(200, body)
+    else
+      :error ->
+        body = Poison.encode!(%{error: "Link not found", code: real_code})
+
+        conn
+        |> put_resp_header("content-type", "application/json")
+        |> send_resp(404, body)
+    end
   end
 
   delete "/urls/*code" do
@@ -71,14 +90,37 @@ defmodule UrlShortener.Http.Router do
 
   get "/*code" do
     "/" <> real_code = conn.request_path
-    {:ok, %Link{long: long}} = @store.get(:store, real_code)
 
-    conn
-    |> put_resp_header("location", long)
-    |> send_resp(302, "")
+    with {:ok, %Link{long: long}} <- @store.get(:store, real_code) do
+      conn
+      |> put_resp_header("location", long)
+      |> send_resp(302, "")
+    else
+      :error ->
+        conn
+        |> send_resp(404, "<html><h1>LINK DOES NOT EXIST</h1></html>")
+    end
   end
 
   match _ do
     send_resp(conn, 404, "Not found")
+  end
+
+  @spec validate(params :: %{}, schema :: atom) :: map()
+  def validate(params, schema) do
+    changeset = schema.changeset(struct(schema), params)
+
+    if changeset.valid? do
+      {:ok, Ecto.Changeset.apply_changes(changeset)}
+    else
+      errors =
+        Ecto.Changeset.traverse_errors(changeset, fn {msg, opts} ->
+          Enum.reduce(opts, msg, fn {key, value}, acc ->
+            String.replace(acc, "%{#{key}}", to_string(value))
+          end)
+        end)
+
+      {:error, errors}
+    end
   end
 end

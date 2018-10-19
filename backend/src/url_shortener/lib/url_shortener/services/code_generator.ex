@@ -1,14 +1,13 @@
 defmodule UrlShortener.Services.CodeGenerator do
-
-  @initial 16769023
-  @shift 16769023
-  @period 1073676287
+  @initial 16_769_023
+  @shift 16_769_023
+  @period 1_073_676_287
 
   def initial do
-  	numeric_to_string @initial
+    numeric_to_string(@initial)
   end
 
-  @spec next(prev_id :: String.t) :: String.t
+  @spec next(prev_id :: String.t()) :: String.t()
   def next(prev_id) do
     numeric = string_to_numeric(prev_id)
     next_numeric = rotate(numeric)

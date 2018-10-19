@@ -1,9 +1,9 @@
 defmodule UrlShortener.Services.Store do
-  @callback create(store :: term(), link :: Data.Link.t) :: :ok
-  @callback get_all(store :: term()) :: [Data.Link.t]
-  @callback delete(store :: term(), code :: String.t) :: :ok
-  @callback get(store :: term(), code :: String.t) :: {:ok, Data.Link.t} | :error
-  @callback get_last_code(store :: term()) :: String.t | nil
+  @callback create(store :: term(), link :: Data.Link.t()) :: :ok
+  @callback get_all(store :: term()) :: [Data.Link.t()]
+  @callback delete(store :: term(), code :: String.t()) :: :ok
+  @callback get(store :: term(), code :: String.t()) :: {:ok, Data.Link.t()} | :error
+  @callback get_last_code(store :: term()) :: String.t() | nil
 end
 
 defmodule UrlShortener.Services.Store.Impl do
@@ -17,27 +17,27 @@ defmodule UrlShortener.Services.Store.Impl do
     GenServer.start_link(__MODULE__, :ok, opts)
   end
 
-  @spec create(store :: term(), link :: Data.Link.t) :: :ok
+  @spec create(store :: term(), link :: Data.Link.t()) :: :ok
   def create(store, link) do
     GenServer.call(store, {:create, link})
   end
 
-  @spec get_all(store :: term()) :: [Data.Link.t]
+  @spec get_all(store :: term()) :: [Data.Link.t()]
   def get_all(store) do
     GenServer.call(store, :get_all)
   end
 
-  @spec delete(store :: term(), code :: String.t) :: :ok
+  @spec delete(store :: term(), code :: String.t()) :: :ok
   def delete(store, code) do
     GenServer.call(store, {:delete, code})
   end
 
-  @spec get(store :: term(), code :: String.t) :: {:ok, Data.Link.t} | :error
+  @spec get(store :: term(), code :: String.t()) :: {:ok, Data.Link.t()} | :error
   def get(store, code) do
     GenServer.call(store, {:get, code})
   end
 
-  @spec get_last_code(store :: term()) :: String.t | nil
+  @spec get_last_code(store :: term()) :: String.t() | nil
   def get_last_code(store) do
     GenServer.call(store, :get_last_code)
   end
@@ -54,8 +54,7 @@ defmodule UrlShortener.Services.Store.Impl do
   end
 
   def handle_call({:create, %{code: code} = link}, _from, state) do
-    {:reply, :ok, %State{state | dict: Map.put(state.dict, code, link),
-                   last_code: code}}
+    {:reply, :ok, %State{state | dict: Map.put(state.dict, code, link), last_code: code}}
   end
 
   def handle_call(:get_all, _from, state) do

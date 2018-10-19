@@ -7,7 +7,7 @@ defmodule Tests.UrlShortener.Services.Store do
   doctest Store
 
   setup_all do
-    {:ok, pid} = Store.start_link []
+    {:ok, pid} = Store.start_link([])
     [pid: pid]
   end
 
@@ -21,10 +21,10 @@ defmodule Tests.UrlShortener.Services.Store do
     links = [
       %Link{code: "1", long: "pig"},
       %Link{code: "2", long: "god"},
-      %Link{code: "3", long: "hedgehog"},
+      %Link{code: "3", long: "hedgehog"}
     ]
 
-    Enum.map links, &Store.create(context[:pid], &1)
+    Enum.map(links, &Store.create(context[:pid], &1))
 
     assert ^links = Store.get_all(context.pid)
   end
@@ -33,14 +33,14 @@ defmodule Tests.UrlShortener.Services.Store do
     links = [
       %Link{code: "1", long: "pig"},
       %Link{code: "2", long: "god"},
-      %Link{code: "3", long: "hedgehog"},
+      %Link{code: "3", long: "hedgehog"}
     ]
 
-    Enum.map links, &Store.create(context[:pid], &1)
+    Enum.map(links, &Store.create(context[:pid], &1))
 
     assert ^links = Store.get_all(context.pid)
 
-    Enum.map links, &Store.delete(context.pid, &1.code)
+    Enum.map(links, &Store.delete(context.pid, &1.code))
 
     assert [] = Store.get_all(context.pid)
   end

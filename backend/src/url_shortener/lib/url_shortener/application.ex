@@ -17,10 +17,11 @@ defmodule UrlShortener.Application do
       Plug.Adapters.Cowboy2.child_spec(
         scheme: :http,
         plug: UrlShortener.Http.Router,
-        options: [port: 8080] # TODO: parametrize port
+        # TODO: parametrize port
+        options: [port: 8080]
       ),
       # UrlShortener.Services.Store.child_spec([name: :store])
-      UrlShortener.Services.Store.Impl.child_spec([name: :store])
+      UrlShortener.Services.Store.Impl.child_spec(name: :store)
       # @store.child_spec([name: :store])
     ]
 
@@ -34,6 +35,7 @@ defmodule UrlShortener.Application do
     case Code.ensure_loaded(ExSync) do
       {:module, ExSync = mod} ->
         mod.start()
+
       {:error, :nofile} ->
         :ok
     end

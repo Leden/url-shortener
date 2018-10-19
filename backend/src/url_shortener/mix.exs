@@ -8,7 +8,7 @@ defmodule UrlShortener.MixProject do
       elixir: "~> 1.7",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
-      elixirc_paths: elixirc_paths(Mix.env),
+      elixirc_paths: elixirc_paths(Mix.env())
     ]
   end
 
@@ -30,11 +30,12 @@ defmodule UrlShortener.MixProject do
       # Prod
       {:cowboy, "~> 2.4"},
       {:plug, "~> 1.6"},
-      {:poison, "~> 4.0"},
-      {:corsica, "~> 1.1"}
+      {:poison, "~> 3.0"},
+      {:corsica, "~> 1.1"},
+      {:ecto, "~> 2.2"}
     ]
   end
 
   defp elixirc_paths(:test), do: ["test/support", "lib"]
-  defp elixirc_paths(_),     do: ["lib"]
+  defp elixirc_paths(_), do: ["lib"]
 end

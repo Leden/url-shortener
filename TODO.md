@@ -7,7 +7,7 @@
 * [x] `tech` host the code on Github
 * [x] `tech` `frontend` configurable backend host url for frontend
 * [x] `tech` `frontend` one command dev env setup: dockerize frontend
-* [ ] `tech` `backend` tests for api errors
+* [x] `tech` `backend` tests for api errors
 
 
 ### Feature-completeness

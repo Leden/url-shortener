@@ -16,84 +16,169 @@ defmodule Tests.UrlShortener.Http.Router do
 
   setup :verify_on_exit!
 
-  test "get /" do
-    resp = conn(:get, "/") |> call()
+  describe "GET /" do
+    test "redirects to /index.html" do
+      resp = conn(:get, "/") |> call()
 
-    assert 302 = resp.status
-    assert {"location", "/index.html"} in resp.resp_headers
+      assert 302 = resp.status
+      assert {"location", "/index.html"} in resp.resp_headers
+    end
   end
 
-  test "get /urls - empty" do
-    Store
-    |> expect(:get_all, fn _ -> [] end)
+  describe "GET /index.html" do
+    test "serves static index.html" do
+      resp = conn(:get, "/index.html") |> call()
 
-    resp = conn(:get, "/urls") |> call()
-
-    assert 200 = resp.status
-    assert [] = json_body(resp)
+      assert 200 = resp.status
+      assert "<html>NOTHING HERE FOR NOW</html>\n" = resp.resp_body
+    end
   end
 
-  test "get /urls - one" do
-    %{code: code, long: long} = link = %Link{code: "Af+//g",
-                                             long: "http://example.com/foo/bar"}
-    Store
-    |> expect(:get_all, fn _ -> [link] end)
+  describe "GET /urls" do
+    test "returns empty list" do
+      Store
+      |> expect(:get_all, fn _ -> [] end)
 
-    resp = conn(:get, "/urls") |> call()
+      resp = conn(:get, "/urls") |> call()
 
-    assert 200 = resp.status
-    assert [%{code: ^code, long: ^long}] = json_body(resp)
+      assert 200 = resp.status
+      assert [] = json_body(resp)
+    end
+
+    test "returns a list of one url" do
+      %{code: code, long: long} = link = %Link{code: "Af+//g", long: "http://example.com/foo/bar"}
+
+      Store
+      |> expect(:get_all, fn _ -> [link] end)
+
+      resp = conn(:get, "/urls") |> call()
+
+      assert 200 = resp.status
+      assert [%{code: ^code, long: ^long}] = json_body(resp)
+    end
+
+    test "returns a list of two urls" do
+      %{code: code, long: long} = link = %Link{code: "Af+//g", long: "http://example.com/foo/bar"}
+
+      Store
+      |> expect(:get_all, fn _ -> [link, link] end)
+
+      resp = conn(:get, "/urls") |> call()
+
+      assert 200 = resp.status
+      assert [%{code: ^code, long: ^long}, %{code: ^code, long: ^long}] = json_body(resp)
+    end
   end
 
-  test "post /urls" do
-    long = "http://example.com/foo"
+  describe "POST /urls" do
+    test "creates a new link" do
+      long = "http://example.com/foo"
 
-    Store
-    |> expect(:get_last_code, fn _ -> nil end)
-    |> expect(:create, fn _, %{long: ^long} -> :ok end)
+      Store
+      |> expect(:get_last_code, fn _ -> nil end)
+      |> expect(:create, fn _, %Link{long: ^long} -> :ok end)
 
-    resp = conn(:post, "/urls", %{"long" => long}) |> call()
+      resp = conn(:post, "/urls", %{"long" => long}) |> call()
 
-    assert 201 = resp.status
-    assert %{long: ^long} = json_body(resp)
+      assert 201 = resp.status
+      assert %{long: ^long} = json_body(resp)
+    end
+
+    test "responds with error on invalid input: missing parameter" do
+      resp = conn(:post, "/urls", %{}) |> call()
+
+      assert 400 = resp.status
+      assert %{long: ["can't be blank"]} = json_body(resp)
+    end
+
+    test "responds with error on invalid input: wrong url format" do
+      resp = conn(:post, "/urls", %{long: "just-random-letters"}) |> call()
+
+      assert 400 = resp.status
+      assert %{long: ["scheme can't be blank", "host can't be blank"]} = json_body(resp)
+    end
+
+    test "responds with error on invalid input: missing scheme from url" do
+      resp = conn(:post, "/urls", %{long: "//example.com"}) |> call()
+
+      assert 400 = resp.status
+      assert %{long: ["scheme can't be blank"]} = json_body(resp)
+    end
+
+    test "responds with error on invalid input: missing host from url" do
+      resp = conn(:post, "/urls", %{long: "http://"}) |> call()
+
+      assert 400 = resp.status
+      assert %{long: ["host can't be blank"]} = json_body(resp)
+    end
   end
 
-  test "get /urls/*code" do
-    code = "Af+//g"
-    long = "http://example.com/foo"
+  describe "GET /urls/*code" do
+    test "returns the requested link metadata" do
+      code = "Af+//g"
+      long = "http://example.com/foo"
 
-    Store
-    |> expect(:get, fn _, ^code -> {:ok, %Link{code: code, long: long}} end)
+      Store
+      |> expect(:get, fn _, ^code -> {:ok, %Link{code: code, long: long}} end)
 
-    resp = conn(:get, "/urls/#{ code }") |> call()
+      resp = conn(:get, "/urls/#{code}") |> call()
 
-    assert 200 = resp.status
-    assert %{code: code, long: long} = json_body(resp)
+      assert 200 = resp.status
+      assert %{code: code, long: long} = json_body(resp)
+    end
+
+    test "returns 404 if no link with given code exists" do
+      code = "foobar"
+
+      Store
+      |> expect(:get, fn _, ^code -> :error end)
+
+      resp = conn(:get, "/urls/#{code}") |> call()
+
+      assert 404 = resp.status
+      assert %{error: "Link not found", code: real_code} = json_body(resp)
+    end
   end
 
-  test "delete /urls/*code" do
-    code = "Af+//g"
+  describe "DELETE /urls/*code" do
+    test "deletes the link with given code" do
+      code = "Af+//g"
 
-    Store
-    |> expect(:delete, fn _, ^code -> :ok end)
+      Store
+      |> expect(:delete, fn _, ^code -> :ok end)
 
-    resp = conn(:delete, "/urls/#{ code }") |> call()
+      resp = conn(:delete, "/urls/#{code}") |> call()
 
-    assert 204 = resp.status
-    assert "" = resp.resp_body
+      assert 204 = resp.status
+      assert "" = resp.resp_body
+    end
   end
 
-  test "get /*code" do
-    code = "Af+//g"
-    long = "http://example.com/foo"
+  describe "GET /*code" do
+    test "redirects to the long url of the link" do
+      code = "Af+//g"
+      long = "http://example.com/foo"
 
-    Store
-    |> expect(:get, fn _, ^code -> {:ok, %Link{code: code, long: long}} end)
+      Store
+      |> expect(:get, fn _, ^code -> {:ok, %Link{code: code, long: long}} end)
 
-    resp = conn(:get, "/#{ code }") |> call()
+      resp = conn(:get, "/#{code}") |> call()
 
-    assert 302 = resp.status
-    assert {"location", long} in resp.resp_headers
-    assert "" = resp.resp_body
+      assert 302 = resp.status
+      assert {"location", long} in resp.resp_headers
+      assert "" = resp.resp_body
+    end
+
+    test "returns 404 if no lonk with given code exists" do
+      code = "Af+//g"
+
+      Store
+      |> expect(:get, fn _, ^code -> :error end)
+
+      resp = conn(:get, "/#{code}") |> call()
+
+      assert 404 = resp.status
+      assert "<html><h1>LINK DOES NOT EXIST</h1></html>" = resp.resp_body
+    end
   end
 end
