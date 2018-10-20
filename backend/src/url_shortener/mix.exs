@@ -23,6 +23,7 @@ defmodule UrlShortener.MixProject do
     [
       # Dev-only
       {:exsync, "~> 0.2", only: :dev},
+      {:credo, "~> 0.10.0", only: [:dev, :test], runtime: false},
 
       # Test-only
       {:mox, "~> 0.4.0", only: :test},
