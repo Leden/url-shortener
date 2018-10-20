@@ -2,8 +2,8 @@
 
 ## Bugs
 
-* [ ] 500 when navigating to a short url that does not exist
-* [ ] long urls w/o `http://` prefix are interpreted as relative by the browser
+* [x] 500 when navigating to a short url that does not exist
+* [x] long urls w/o `http://` prefix are interpreted as relative by the browser
 
 
 ## Chores
