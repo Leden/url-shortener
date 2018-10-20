@@ -3,6 +3,12 @@ defmodule UrlShortener.Services.CodeGenerator do
   @shift 16_769_023
   @period 1_073_676_287
 
+  @hashids Hashids.new(
+             salt: Application.get_env(:url_shortener, :secret_key),
+             min_len: Application.get_env(:url_shortener, :code_min_length),
+             alphabet: Application.get_env(:url_shortener, :code_alphabet)
+           )
+
   def initial do
     numeric_to_string(@initial)
   end
@@ -14,17 +20,18 @@ defmodule UrlShortener.Services.CodeGenerator do
     numeric_to_string(next_numeric)
   end
 
+  @spec string_to_numeric(str_id :: String.t()) :: integer
   def string_to_numeric(str_id) do
-    {:ok, bytes} = Base.decode64(str_id, padding: false)
-    <<numeric::32>> = bytes
+    [numeric] = Hashids.decode!(@hashids, str_id)
     numeric
   end
 
+  @spec numeric_to_string(num_id :: integer) :: String.t()
   def numeric_to_string(num_id) do
-    bytes = <<num_id::32>>
-    Base.encode64(bytes, padding: false)
+    Hashids.encode(@hashids, num_id)
   end
 
+  @spec rotate(numeric_id :: integer) :: integer
   def rotate(numeric_id) do
     rem(numeric_id + @shift, @period)
   end

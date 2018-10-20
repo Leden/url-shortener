@@ -62,9 +62,7 @@ defmodule UrlShortener.Http.Router do
   end
 
   get "/urls/*code" do
-    "/urls/" <> real_code = conn.request_path
-
-    with {:ok, link} <- @store.get(:store, real_code) do
+    with {:ok, link} <- @store.get(:store, hd(code)) do
       body = Poison.encode!(link)
 
       conn
@@ -72,7 +70,7 @@ defmodule UrlShortener.Http.Router do
       |> send_resp(200, body)
     else
       :error ->
-        body = Poison.encode!(%{error: "Link not found", code: real_code})
+        body = Poison.encode!(%{error: "Link not found", code: hd(code)})
 
         conn
         |> put_resp_header("content-type", "application/json")
@@ -81,17 +79,14 @@ defmodule UrlShortener.Http.Router do
   end
 
   delete "/urls/*code" do
-    "/urls/" <> real_code = conn.request_path
-    :ok = @store.delete(:store, real_code)
+    :ok = @store.delete(:store, hd(code))
 
     conn
     |> send_resp(204, "")
   end
 
   get "/*code" do
-    "/" <> real_code = conn.request_path
-
-    with {:ok, %Link{long: long}} <- @store.get(:store, real_code) do
+    with {:ok, %Link{long: long}} <- @store.get(:store, hd(code)) do
       conn
       |> put_resp_header("location", long)
       |> send_resp(302, "")

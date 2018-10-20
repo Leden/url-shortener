@@ -14,7 +14,11 @@
 ### Feature-completeness
 
 * [ ] `feature` Persistence
-* [ ] `feature` Better string code generation
+* [x] `feature` Better string code generation
+	- https://github.com/alco/hashids-elixir
+	- https://github.com/dvv/base64url
+	- https://github.com/jrdnull/base58
+	- https://github.com/igas/base62
 
 
 ### Launch

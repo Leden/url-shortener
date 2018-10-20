@@ -23,7 +23,10 @@ use Mix.Config
 
 config :url_shortener,
   store_module: UrlShortener.Services.Store.Impl,
-  corsica: [origins: []]
+  corsica: [origins: []],
+  secret_key: "baingahLeepeingailajahDeeDo3tahcieweed0quie4dee8Uochahngohph2Tux",
+  code_min_length: 3,
+  code_alphabet: "123456789abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ"
 
 # It is also possible to import configuration files, relative to this
 # directory. For example, you can emulate configuration per environment

@@ -32,7 +32,8 @@ defmodule UrlShortener.MixProject do
       {:plug, "~> 1.6"},
       {:poison, "~> 3.0"},
       {:corsica, "~> 1.1"},
-      {:ecto, "~> 2.2"}
+      {:ecto, "~> 2.2"},
+      {:hashids, "~> 2.0"}
     ]
   end
 

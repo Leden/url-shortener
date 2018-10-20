@@ -7,4 +7,6 @@ RUN mix local.hex --force && \
 
 WORKDIR /app/url_shortener
 
-CMD mix deps.get && iex -S mix
+CMD mix local.rebar --force && \
+	mix deps.get && \
+	iex -S mix
