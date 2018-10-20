@@ -1,4 +1,7 @@
 defmodule UrlShortener.Services.CodeGenerator do
+  @moduledoc """
+  Generates short codes for Links
+  """
   @initial 16_769_023
   @shift 16_769_023
   @period 1_073_676_287

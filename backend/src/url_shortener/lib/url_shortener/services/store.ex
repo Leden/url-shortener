@@ -1,4 +1,7 @@
 defmodule UrlShortener.Services.Store do
+  @moduledoc """
+  Behaviour describing the Store interface.
+  """
   @callback create(store :: term(), link :: Data.Link.t()) :: :ok
   @callback get_all(store :: term()) :: [Data.Link.t()]
   @callback delete(store :: term(), code :: String.t()) :: :ok
@@ -7,6 +10,9 @@ defmodule UrlShortener.Services.Store do
 end
 
 defmodule UrlShortener.Services.Store.Impl do
+  @moduledoc """
+  Stores the Links in memory.
+  """
   # TODO: preserve creation order
   @behaviour UrlShortener.Services.Store
   use GenServer
@@ -45,6 +51,9 @@ defmodule UrlShortener.Services.Store.Impl do
   ## Server Callbacks
 
   defmodule State do
+    @moduledoc """
+    A struct of the state.
+    """
     @enforce_keys [:dict, :last_code]
     defstruct [:dict, :last_code]
   end

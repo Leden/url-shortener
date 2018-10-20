@@ -7,6 +7,9 @@ defmodule UrlShortener.Http.Schemas.CreateUrl do
   end
 
   defmodule Uri do
+    @moduledoc """
+    Schema for validatin the Urls from user input
+    """
     use Ecto.Schema
 
     embedded_schema do
