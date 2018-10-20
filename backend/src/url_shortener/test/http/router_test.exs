@@ -4,8 +4,8 @@ defmodule Tests.UrlShortener.Http.Router do
 
   import Mox
 
-  alias UrlShortener.Http.Router
   alias UrlShortener.Data.Link
+  alias UrlShortener.Http.Router
   alias UrlShortener.Services.Store.Mock, as: Store
 
   def call(conn) do

@@ -2,8 +2,8 @@ defmodule UrlShortener.Http.Router do
   use Plug.Router
 
   alias UrlShortener.Data.Link
-  alias UrlShortener.Services.CodeGenerator
   alias UrlShortener.Http.Schemas
+  alias UrlShortener.Services.CodeGenerator
 
   @store Application.get_env(:url_shortener, :store_module)
 
