@@ -46,7 +46,7 @@ defmodule Tests.UrlShortener.Http.Router do
     end
 
     test "returns a list of one url" do
-      %{code: code, long: long} = link = %Link{code: "Af+//g", long: "http://example.com/foo/bar"}
+      %{code: code, long: long} = link = %Link{code: "Afg", long: "http://example.com/foo/bar"}
 
       Store
       |> expect(:get_all, fn _ -> [link] end)
@@ -58,7 +58,7 @@ defmodule Tests.UrlShortener.Http.Router do
     end
 
     test "returns a list of two urls" do
-      %{code: code, long: long} = link = %Link{code: "Af+//g", long: "http://example.com/foo/bar"}
+      %{code: code, long: long} = link = %Link{code: "Afg", long: "http://example.com/foo/bar"}
 
       Store
       |> expect(:get_all, fn _ -> [link, link] end)
@@ -115,7 +115,7 @@ defmodule Tests.UrlShortener.Http.Router do
 
   describe "GET /urls/*code" do
     test "returns the requested link metadata" do
-      code = "Af+//g"
+      code = "Afg"
       long = "http://example.com/foo"
 
       Store
@@ -142,7 +142,7 @@ defmodule Tests.UrlShortener.Http.Router do
 
   describe "DELETE /urls/*code" do
     test "deletes the link with given code" do
-      code = "Af+//g"
+      code = "Afg"
 
       Store
       |> expect(:delete, fn _, ^code -> :ok end)
@@ -156,7 +156,7 @@ defmodule Tests.UrlShortener.Http.Router do
 
   describe "GET /*code" do
     test "redirects to the long url of the link" do
-      code = "Af+//g"
+      code = "Afg"
       long = "http://example.com/foo"
 
       Store
@@ -170,7 +170,7 @@ defmodule Tests.UrlShortener.Http.Router do
     end
 
     test "returns 404 if no lonk with given code exists" do
-      code = "Af+//g"
+      code = "Afg"
 
       Store
       |> expect(:get, fn _, ^code -> :error end)
