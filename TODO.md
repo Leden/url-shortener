@@ -8,6 +8,7 @@
 * [x] `tech` `frontend` configurable backend host url for frontend
 * [x] `tech` `frontend` one command dev env setup: dockerize frontend
 * [x] `tech` `backend` tests for api errors
+* [ ] `tech` `backend` code inspections (Credo?)
 
 
 ### Feature-completeness
