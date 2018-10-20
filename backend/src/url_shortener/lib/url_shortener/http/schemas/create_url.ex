@@ -42,7 +42,8 @@ defmodule UrlShortener.Http.Schemas.CreateUrl do
         changeset
 
       %{valid?: false} = uri_changeset ->
-        Ecto.Changeset.traverse_errors(uri_changeset, fn _, field, {msg, opts} ->
+        uri_changeset
+        |> Ecto.Changeset.traverse_errors(fn _, field, {msg, opts} ->
           Enum.reduce(opts, msg, fn {key, value}, acc ->
             String.replace("#{field} #{acc}", "%{#{key}}", to_string(value))
           end)
