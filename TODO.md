@@ -20,6 +20,7 @@
 ### Launch
 
 * [ ] `tech` Deploy for real
+	- [ ] Runtime configuration (:secret_key, DB settings, etc)
 
 
 ## V2
