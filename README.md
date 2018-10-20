@@ -2,17 +2,26 @@
 
 A simple url shortener
 
-## Frontend
+## Development
+
+To bootstrap the environment, run
+
+    ./scripts/bootstrap.sh
+
+
+## Architecture
+
+### Frontend
 
 Elm
 
 
-## Backend
+### Backend
 
 Elixir
 
 
-### Store
+#### Store
 
 A process which stores the shortened urls with their full versions.
 
@@ -23,7 +32,7 @@ API:
 * Get full url (short)
 
 
-### ID Generator
+#### ID Generator
 
 A module which generates a unique ID for short url each time it's asked.
 
@@ -31,17 +40,17 @@ API:
 * next ID: (previous ID)
 
 
-### HTTP Worker
+#### HTTP Worker
 
 A Plug Process which handles the CRUD HTTP requests and maps them to controller functions.
 
 
-### Controller
+#### Controller
 
 A module with http api implementations, delegating to ID Generator and Store.
 
 
-### HTTP API
+#### HTTP API
 
 * GET /urls : list all the urls in the store
 * POST /urls : shorten a new url
@@ -49,6 +58,6 @@ A module with http api implementations, delegating to ID Generator and Store.
 * DELETE /urls/{url-id} : remove shortened url
 * GET /{short-url} : redirect to full version
 
-## Persistence
+### Persistence
 
 None yet
