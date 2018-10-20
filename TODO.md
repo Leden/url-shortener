@@ -55,3 +55,4 @@
 
 * [ ] `tech` `backend` `frontend` Event-based API (websocket)
 * [ ] `tech` `backend` Rewrite to Phoenix?
+* [ ] `tech` make a cookiecutter(-like) template based on this project
