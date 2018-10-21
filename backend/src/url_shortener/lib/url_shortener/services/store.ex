@@ -13,7 +13,6 @@ defmodule UrlShortener.Services.Store.Impl do
   @moduledoc """
   Stores the Links in memory.
   """
-  # TODO: preserve creation order
   @behaviour UrlShortener.Services.Store
   use GenServer
 
@@ -50,35 +49,33 @@ defmodule UrlShortener.Services.Store.Impl do
 
   ## Server Callbacks
 
-  defmodule State do
-    @moduledoc """
-    A struct of the state.
-    """
-    @enforce_keys [:dict, :last_code]
-    defstruct [:dict, :last_code]
-  end
-
   def init(:ok) do
-    {:ok, %State{dict: %{}, last_code: nil}}
+    {:ok, OrderedMap.new()}
   end
 
   def handle_call({:create, %{code: code} = link}, _from, state) do
-    {:reply, :ok, %State{state | dict: Map.put(state.dict, code, link), last_code: code}}
+    {:reply, :ok, OrderedMap.put(state, code, link)}
   end
 
   def handle_call(:get_all, _from, state) do
-    {:reply, Map.values(state.dict), state}
+    {:reply, OrderedMap.values(state), state}
   end
 
   def handle_call({:delete, code}, _from, state) do
-    {:reply, :ok, %State{state | dict: Map.delete(state.dict, code)}}
+    {:reply, :ok, OrderedMap.delete(state, code)}
   end
 
   def handle_call({:get, code}, _from, state) do
-    {:reply, Map.fetch(state.dict, code), state}
+    {:reply, OrderedMap.fetch(state, code), state}
   end
 
-  def handle_call(:get_last_code, _from, %State{last_code: last_code} = state) do
+  def handle_call(:get_last_code, _from, state) do
+    last_code =
+      case state.keys do
+        [] -> nil
+        [code | _] -> code
+      end
+
     {:reply, last_code, state}
   end
 end

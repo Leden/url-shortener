@@ -34,7 +34,8 @@ defmodule UrlShortener.MixProject do
       {:poison, "~> 3.0"},
       {:corsica, "~> 1.1"},
       {:ecto, "~> 2.2"},
-      {:hashids, "~> 2.0"}
+      {:hashids, "~> 2.0"},
+      {:ordered_map, github: "jonnystorm/ordered-map-elixir"}
     ]
   end
 
