@@ -20,6 +20,8 @@ if [ $RESULT != 0 ]
 then
 	echo -e "\033[0;31mGit commit aborted due to failing tests\033[0m"
 	exit 1
+else
+	echo -e "\033[1;32mTests are OK!\033[0m"
 fi
 
 
@@ -41,4 +43,6 @@ if [ $RESULT != 0 ]
 then
 	echo -e "\033[1;33mGit commit aborted due to unhappy linter\033[0m"
 	exit 1
+else
+	echo -e "\033[1;32mLinter is happy!\033[0m"
 fi
