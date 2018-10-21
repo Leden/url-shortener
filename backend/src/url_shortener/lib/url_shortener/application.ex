@@ -3,18 +3,22 @@ defmodule UrlShortener.Application do
 
   use Application
 
+  alias Plug.Adapters.Cowboy2
+
+  alias UrlShortener.Services.Store.Impl, as: Store
+
   def start(_type, _args) do
     start_exsync()
 
     http_port = Application.get_env(:url_shortener, :http_port)
 
     children = [
-      Plug.Adapters.Cowboy2.child_spec(
+      Cowboy2.child_spec(
         scheme: :http,
         plug: UrlShortener.Http.Router,
         options: [port: http_port]
       ),
-      UrlShortener.Services.Store.Impl.child_spec(name: :store)
+      Store.child_spec(name: :store)
     ]
 
     opts = [strategy: :one_for_one, name: UrlShortener.Supervisor]

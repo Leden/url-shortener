@@ -1,6 +1,6 @@
 defmodule UrlShortener.Http.Schemas.CreateUrl do
   use Ecto.Schema
-  import Ecto.Changeset
+  alias Ecto.Changeset
 
   embedded_schema do
     field(:long, :string)
@@ -19,20 +19,20 @@ defmodule UrlShortener.Http.Schemas.CreateUrl do
 
     def changeset(struct, params \\ %{}) do
       struct
-      |> cast(params, [:scheme, :host])
-      |> validate_required([:scheme, :host])
+      |> Changeset.cast(params, [:scheme, :host])
+      |> Changeset.validate_required([:scheme, :host])
     end
   end
 
   def changeset(struct, params \\ %{}) do
     struct
-    |> cast(params, [:long])
-    |> validate_required([:long])
+    |> Changeset.cast(params, [:long])
+    |> Changeset.validate_required([:long])
     |> validate_uri(:long, Uri)
   end
 
   def validate_uri(changeset, field, schema) do
-    with value when is_binary(value) <- get_field(changeset, field),
+    with value when is_binary(value) <- Changeset.get_field(changeset, field),
          uri = URI.parse(value),
          uri_changeset = schema.changeset(struct(schema), Map.from_struct(uri)),
          %{valid?: true} <- uri_changeset do
@@ -43,14 +43,14 @@ defmodule UrlShortener.Http.Schemas.CreateUrl do
 
       %{valid?: false} = uri_changeset ->
         uri_changeset
-        |> Ecto.Changeset.traverse_errors(fn _, field, {msg, opts} ->
+        |> Changeset.traverse_errors(fn _, field, {msg, opts} ->
           Enum.reduce(opts, msg, fn {key, value}, acc ->
             String.replace("#{field} #{acc}", "%{#{key}}", to_string(value))
           end)
         end)
         |> Enum.reduce(changeset, fn {_, msgs}, acc ->
           Enum.reduce(msgs, acc, fn msg, acc ->
-            add_error(acc, field, msg)
+            Changeset.add_error(acc, field, msg)
           end)
         end)
     end

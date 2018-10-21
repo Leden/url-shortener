@@ -1,6 +1,8 @@
 defmodule UrlShortener.Http.Router do
   use Plug.Router
 
+  alias Ecto.Changeset
+
   alias UrlShortener.Data.Link
   alias UrlShortener.Http.Schemas
   alias UrlShortener.Services.CodeGenerator
@@ -106,10 +108,10 @@ defmodule UrlShortener.Http.Router do
     changeset = schema.changeset(struct(schema), params)
 
     if changeset.valid? do
-      {:ok, Ecto.Changeset.apply_changes(changeset)}
+      {:ok, Changeset.apply_changes(changeset)}
     else
       errors =
-        Ecto.Changeset.traverse_errors(changeset, fn {msg, opts} ->
+        Changeset.traverse_errors(changeset, fn {msg, opts} ->
           Enum.reduce(opts, msg, fn {key, value}, acc ->
             String.replace(acc, "%{#{key}}", to_string(value))
           end)
