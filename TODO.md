@@ -10,6 +10,7 @@
 * [x] `tech` `backend` tests for api errors
 * [x] `tech` `backend` code inspections (Credo?)
 * [ ] `tech` `backend` fix all the linting issues and make pre-commit call run-linter
+* [ ] `tech` `backend` introduce test coverage control and run it from pre-commit
 
 
 ### Feature-completeness
