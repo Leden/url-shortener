@@ -8,7 +8,14 @@ defmodule UrlShortener.MixProject do
       elixir: "~> 1.7",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
-      elixirc_paths: elixirc_paths(Mix.env())
+      elixirc_paths: elixirc_paths(Mix.env()),
+      test_coverage: [
+        tool: Coverex.Task,
+        ignore_modules: [
+          Poison.Encoder.UrlShortener.Data.Link,
+          Elixir.UrlShortener.Services.Store.Mock
+        ]
+      ]
     ]
   end
 
@@ -28,6 +35,7 @@ defmodule UrlShortener.MixProject do
 
       # Test-only
       {:mox, "~> 0.4.0", only: :test},
+      {:coverex, "~> 1.5", only: :test},
 
       # Prod
       {:cowboy, "~> 2.4"},
