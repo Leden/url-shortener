@@ -2,10 +2,12 @@ defmodule UrlShortener.Services.Store do
   @moduledoc """
   Behaviour describing the Store interface.
   """
-  @callback create(store :: term(), link :: Data.Link.t()) :: :ok
-  @callback get_all(store :: term()) :: [Data.Link.t()]
+  alias UrlShortener.Data.Link
+
+  @callback create(store :: term(), link :: Link.t()) :: :ok
+  @callback get_all(store :: term()) :: [Link.t()]
   @callback delete(store :: term(), code :: String.t()) :: :ok
-  @callback get(store :: term(), code :: String.t()) :: {:ok, Data.Link.t()} | :error
+  @callback get(store :: term(), code :: String.t()) :: {:ok, Link.t()} | :error
   @callback get_last_code(store :: term()) :: String.t() | nil
 end
 
@@ -16,18 +18,18 @@ defmodule UrlShortener.Services.Store.Impl do
   @behaviour UrlShortener.Services.Store
   use GenServer
 
-  alias UrlShortener.Data
+  alias UrlShortener.Data.Link
 
   def start_link(opts) do
     GenServer.start_link(__MODULE__, :ok, opts)
   end
 
-  @spec create(store :: term(), link :: Data.Link.t()) :: :ok
+  @spec create(store :: term(), link :: Link.t()) :: :ok
   def create(store, link) do
     GenServer.call(store, {:create, link})
   end
 
-  @spec get_all(store :: term()) :: [Data.Link.t()]
+  @spec get_all(store :: term()) :: [Link.t()]
   def get_all(store) do
     GenServer.call(store, :get_all)
   end
@@ -37,7 +39,7 @@ defmodule UrlShortener.Services.Store.Impl do
     GenServer.call(store, {:delete, code})
   end
 
-  @spec get(store :: term(), code :: String.t()) :: {:ok, Data.Link.t()} | :error
+  @spec get(store :: term(), code :: String.t()) :: {:ok, Link.t()} | :error
   def get(store, code) do
     GenServer.call(store, {:get, code})
   end
@@ -53,7 +55,7 @@ defmodule UrlShortener.Services.Store.Impl do
     {:ok, OrderedMap.new()}
   end
 
-  def handle_call({:create, %{code: code} = link}, _from, state) do
+  def handle_call({:create, %Link{code: code} = link}, _from, state) do
     {:reply, :ok, OrderedMap.put(state, code, link)}
   end
 

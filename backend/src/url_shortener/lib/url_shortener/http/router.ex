@@ -103,7 +103,7 @@ defmodule UrlShortener.Http.Router do
     send_resp(conn, 404, "Not found")
   end
 
-  @spec validate(params :: %{}, schema :: atom) :: map()
+  @spec validate(params :: map(), schema :: atom()) :: {:error, map()} | {:ok, map()}
   def validate(params, schema) do
     changeset = schema.changeset(struct(schema), params)
 
