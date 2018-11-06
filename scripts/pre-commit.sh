@@ -5,7 +5,7 @@ exec 1>&2
 ### Check if tests are failing ###
 
 STASH_NAME="pre-commit-$(date +%s)"
-git stash save -q --keep-index $STASH_NAME
+git stash save -q -u --keep-index $STASH_NAME
 
 ./scripts/run-tests.sh
 RESULT=$?
@@ -28,7 +28,7 @@ fi
 ### Check if linter is concerned ###
 
 STASH_NAME="pre-commit-$(date +%s)"
-git stash save -q --keep-index $STASH_NAME
+git stash save -q -u --keep-index $STASH_NAME
 
 ./scripts/run-linter.sh
 RESULT=$?
