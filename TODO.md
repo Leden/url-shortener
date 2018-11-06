@@ -16,6 +16,8 @@
 ### Feature-completeness
 
 * [ ] `feature` Persistence
+  * [ ] `tech` `backend` implement [architecture](ARCHITECTURE.md)
+
 * [x] `feature` Better string code generation
 	- https://github.com/alco/hashids-elixir
 	- https://github.com/dvv/base64url
