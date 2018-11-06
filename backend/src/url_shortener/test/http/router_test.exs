@@ -1,12 +1,12 @@
-defmodule Tests.UrlShortener.Http.Router do
+defmodule Tests.UrlShortener.Adapters.Http.Router do
   use ExUnit.Case, async: true
   use Plug.Test
 
   import Mox
 
+  alias UrlShortener.Adapters.Http.Router
   alias UrlShortener.Data.Link
-  alias UrlShortener.Http.Router
-  alias UrlShortener.Services.Store.Mock, as: Store
+  alias UrlShortener.Services.Cache.Mock, as: Cache
 
   def call(conn) do
     Router.call(conn, Router.init([]))
@@ -36,7 +36,7 @@ defmodule Tests.UrlShortener.Http.Router do
 
   describe "GET /urls" do
     test "returns empty list" do
-      Store
+      Cache
       |> expect(:get_all, fn _ -> [] end)
 
       resp = conn(:get, "/urls") |> call()
@@ -48,7 +48,7 @@ defmodule Tests.UrlShortener.Http.Router do
     test "returns a list of one url" do
       %{code: code, long: long} = link = %Link{code: "Afg", long: "http://example.com/foo/bar"}
 
-      Store
+      Cache
       |> expect(:get_all, fn _ -> [link] end)
 
       resp = conn(:get, "/urls") |> call()
@@ -60,7 +60,7 @@ defmodule Tests.UrlShortener.Http.Router do
     test "returns a list of two urls" do
       %{code: code, long: long} = link = %Link{code: "Afg", long: "http://example.com/foo/bar"}
 
-      Store
+      Cache
       |> expect(:get_all, fn _ -> [link, link] end)
 
       resp = conn(:get, "/urls") |> call()
@@ -74,7 +74,7 @@ defmodule Tests.UrlShortener.Http.Router do
     test "creates a new link" do
       long = "http://example.com/foo"
 
-      Store
+      Cache
       |> expect(:get_last_code, fn _ -> nil end)
       |> expect(:create, fn _, %Link{long: ^long} -> :ok end)
 
@@ -118,7 +118,7 @@ defmodule Tests.UrlShortener.Http.Router do
       code = "Afg"
       long = "http://example.com/foo"
 
-      Store
+      Cache
       |> expect(:get, fn _, ^code -> {:ok, %Link{code: code, long: long}} end)
 
       resp = conn(:get, "/urls/#{code}") |> call()
@@ -130,7 +130,7 @@ defmodule Tests.UrlShortener.Http.Router do
     test "returns 404 if no link with given code exists" do
       code = "foobar"
 
-      Store
+      Cache
       |> expect(:get, fn _, ^code -> :error end)
 
       resp = conn(:get, "/urls/#{code}") |> call()
@@ -144,7 +144,7 @@ defmodule Tests.UrlShortener.Http.Router do
     test "deletes the link with given code" do
       code = "Afg"
 
-      Store
+      Cache
       |> expect(:delete, fn _, ^code -> :ok end)
 
       resp = conn(:delete, "/urls/#{code}") |> call()
@@ -159,7 +159,7 @@ defmodule Tests.UrlShortener.Http.Router do
       code = "Afg"
       long = "http://example.com/foo"
 
-      Store
+      Cache
       |> expect(:get, fn _, ^code -> {:ok, %Link{code: code, long: long}} end)
 
       resp = conn(:get, "/#{code}") |> call()
@@ -172,7 +172,7 @@ defmodule Tests.UrlShortener.Http.Router do
     test "returns 404 if no lonk with given code exists" do
       code = "Afg"
 
-      Store
+      Cache
       |> expect(:get, fn _, ^code -> :error end)
 
       resp = conn(:get, "/#{code}") |> call()

@@ -22,12 +22,29 @@ use Mix.Config
 #
 
 config :url_shortener,
-  store_module: UrlShortener.Services.Store.Impl,
+  cache_module: UrlShortener.Services.Cache.GenServerCache,
   corsica: [origins: []],
   secret_key: "baingahLeepeingailajahDeeDo3tahcieweed0quie4dee8Uochahngohph2Tux",
   code_min_length: 3,
   code_alphabet: "123456789abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ",
-  http_port: 8080
+  ecto_repos: [UrlShortener.Adapters.Database.Repo],
+  supervise_children: [
+    {Plug.Adapters.Cowboy2,
+     [
+       scheme: :http,
+       plug: UrlShortener.Adapters.Http.Router,
+       options: [port: 8080]
+     ]},
+    {UrlShortener.Services.Cache.GenServerCache, [name: :cache]},
+    UrlShortener.Adapters.Database.Repo
+  ]
+
+config :url_shortener, UrlShortener.Adapters.Database.Repo,
+  adapter: Ecto.Adapters.Postgres,
+  database: "postgres",
+  username: "postgres",
+  password: "haev2uavefoR2Daequ6iequ4ung7vah3",
+  hostname: "postgres"
 
 # It is also possible to import configuration files, relative to this
 # directory. For example, you can emulate configuration per environment

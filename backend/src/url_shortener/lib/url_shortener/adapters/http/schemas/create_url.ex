@@ -1,4 +1,4 @@
-defmodule UrlShortener.Http.Schemas.CreateUrl do
+defmodule UrlShortener.Adapters.Http.Schemas.CreateUrl do
   use Ecto.Schema
   alias Ecto.Changeset
 

@@ -1,1 +1,1 @@
-Mox.defmock(UrlShortener.Services.Store.Mock, for: UrlShortener.Services.Store)
+Mox.defmock(UrlShortener.Services.Cache.Mock, for: UrlShortener.Services.Cache)

@@ -1,6 +1,6 @@
-defmodule UrlShortener.Services.Store do
+defmodule UrlShortener.Services.Cache do
   @moduledoc """
-  Behaviour describing the Store interface.
+  Behaviour describing the Cache interface.
   """
   alias UrlShortener.Data.Link
 
@@ -11,11 +11,12 @@ defmodule UrlShortener.Services.Store do
   @callback get_last_code(store :: term()) :: String.t() | nil
 end
 
-defmodule UrlShortener.Services.Store.Impl do
+defmodule UrlShortener.Services.Cache.GenServerCache do
   @moduledoc """
-  Stores the Links in memory.
+  Caches the Links in memory.
   """
-  @behaviour UrlShortener.Services.Store
+  @behaviour UrlShortener.Services.Cache
+
   use GenServer
 
   alias UrlShortener.Data.Link
@@ -24,26 +25,31 @@ defmodule UrlShortener.Services.Store.Impl do
     GenServer.start_link(__MODULE__, :ok, opts)
   end
 
+  @impl UrlShortener.Services.Cache
   @spec create(store :: term(), link :: Link.t()) :: :ok
   def create(store, link) do
     GenServer.call(store, {:create, link})
   end
 
+  @impl UrlShortener.Services.Cache
   @spec get_all(store :: term()) :: [Link.t()]
   def get_all(store) do
     GenServer.call(store, :get_all)
   end
 
+  @impl UrlShortener.Services.Cache
   @spec delete(store :: term(), code :: String.t()) :: :ok
   def delete(store, code) do
     GenServer.call(store, {:delete, code})
   end
 
+  @impl UrlShortener.Services.Cache
   @spec get(store :: term(), code :: String.t()) :: {:ok, Link.t()} | :error
   def get(store, code) do
     GenServer.call(store, {:get, code})
   end
 
+  @impl UrlShortener.Services.Cache
   @spec get_last_code(store :: term()) :: String.t() | nil
   def get_last_code(store) do
     GenServer.call(store, :get_last_code)
@@ -51,10 +57,12 @@ defmodule UrlShortener.Services.Store.Impl do
 
   ## Server Callbacks
 
+  @impl GenServer
   def init(:ok) do
     {:ok, OrderedMap.new()}
   end
 
+  @impl GenServer
   def handle_call({:create, %Link{code: code} = link}, _from, state) do
     {:reply, :ok, OrderedMap.put(state, code, link)}
   end

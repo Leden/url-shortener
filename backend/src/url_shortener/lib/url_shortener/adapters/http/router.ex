@@ -1,13 +1,13 @@
-defmodule UrlShortener.Http.Router do
+defmodule UrlShortener.Adapters.Http.Router do
   use Plug.Router
 
   alias Ecto.Changeset
 
+  alias UrlShortener.Adapters.Http.Schemas
   alias UrlShortener.Data.Link
-  alias UrlShortener.Http.Schemas
   alias UrlShortener.Services.CodeGenerator
 
-  @store Application.get_env(:url_shortener, :store_module)
+  @cache Application.get_env(:url_shortener, :cache_module)
 
   plug(Corsica, Application.get_env(:url_shortener, :corsica))
 
@@ -33,7 +33,7 @@ defmodule UrlShortener.Http.Router do
   end
 
   get "/urls" do
-    body = @store.get_all(:store) |> Poison.encode!()
+    body = @cache.get_all(:cache) |> Poison.encode!()
 
     conn
     |> put_resp_header("content-type", "application/json")
@@ -42,11 +42,11 @@ defmodule UrlShortener.Http.Router do
 
   post "/urls" do
     with {:ok, %{long: long}} <- validate(conn.params, Schemas.CreateUrl) do
-      prev_code = @store.get_last_code(:store)
+      prev_code = @cache.get_last_code(:cache)
       code = CodeGenerator.next(prev_code || CodeGenerator.initial())
       link = %Link{code: code, long: long}
 
-      :ok = @store.create(:store, link)
+      :ok = @cache.create(:cache, link)
 
       body = Poison.encode!(link)
 
@@ -64,7 +64,7 @@ defmodule UrlShortener.Http.Router do
   end
 
   get "/urls/*code" do
-    with {:ok, link} <- @store.get(:store, hd(code)) do
+    with {:ok, link} <- @cache.get(:cache, hd(code)) do
       body = Poison.encode!(link)
 
       conn
@@ -81,14 +81,14 @@ defmodule UrlShortener.Http.Router do
   end
 
   delete "/urls/*code" do
-    :ok = @store.delete(:store, hd(code))
+    :ok = @cache.delete(:cache, hd(code))
 
     conn
     |> send_resp(204, "")
   end
 
   get "/*code" do
-    with {:ok, %Link{long: long}} <- @store.get(:store, hd(code)) do
+    with {:ok, %Link{long: long}} <- @cache.get(:cache, hd(code)) do
       conn
       |> put_resp_header("location", long)
       |> send_resp(302, "")

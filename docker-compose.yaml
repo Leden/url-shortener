@@ -20,3 +20,9 @@ services:
     volumes:
       - "./frontend:/app"
     tty: true
+
+  postgres:
+    image: postgres
+    restart: always
+    environment:
+        POSTGRES_PASSWORD: "haev2uavefoR2Daequ6iequ4ung7vah3"

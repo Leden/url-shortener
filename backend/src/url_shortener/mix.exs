@@ -13,7 +13,7 @@ defmodule UrlShortener.MixProject do
         tool: Coverex.Task,
         ignore_modules: [
           Poison.Encoder.UrlShortener.Data.Link,
-          Elixir.UrlShortener.Services.Store.Mock
+          UrlShortener.Services.Cache.Mock
         ]
       ]
     ]
@@ -29,22 +29,23 @@ defmodule UrlShortener.MixProject do
   defp deps do
     [
       # Dev-only
-      {:exsync, "~> 0.2", only: :dev},
-      {:credo, "~> 0.10.0", only: [:dev, :test], runtime: false},
+      {:credo, "~> 0.10.0", only: [:dev], runtime: false},
       {:dialyxir, "~> 1.0.0-rc.3", only: [:dev], runtime: false},
+      {:exsync, "~> 0.2", only: :dev},
 
       # Test-only
-      {:mox, "~> 0.4.0", only: :test},
       {:coverex, "~> 1.5", only: :test},
+      {:mox, "~> 0.4.0", only: :test},
 
       # Prod
-      {:cowboy, "~> 2.4"},
-      {:plug, "~> 1.6"},
-      {:poison, "~> 3.0"},
       {:corsica, "~> 1.1"},
+      {:cowboy, "~> 2.4"},
       {:ecto, "~> 2.2"},
       {:hashids, "~> 2.0"},
-      {:ordered_map, github: "jonnystorm/ordered-map-elixir"}
+      {:ordered_map, github: "jonnystorm/ordered-map-elixir"},
+      {:plug, "~> 1.6"},
+      {:poison, "~> 3.0"},
+      {:postgrex, "~> 0.11"}
     ]
   end
 
