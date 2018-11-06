@@ -60,3 +60,4 @@
 * [ ] `tech` `backend` `frontend` Event-based API (websocket)
 * [ ] `tech` `backend` Rewrite to Phoenix?
 * [ ] `tech` make a cookiecutter(-like) template based on this project
+* [ ] `tech` `backend` use H2 push to serve frontend bundle
